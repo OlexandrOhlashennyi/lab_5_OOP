@@ -44,6 +44,9 @@ public:
 	virtual void output() {
 		cout << "Destination: " << this->get_destination() << "\t\tduration: " << this->get_duration() << endl;
 	}
+	friend void SwapValues(pass*& a, pass*& b) {
+		swap(a, b);
+	}
 };
 
 class vacation : public pass {
@@ -59,8 +62,8 @@ public:
 	double get_journey_p() { return journey_price; }
 	void set_day_p(double p) { day_price = p; }
 	void set_journey_p(double p) { journey_price = p; }
-	double total() { return (day_price * duration + journey_price * 2) * cur / 100; }
 	currency get_currency() { return cur; }
+	double total() { return (day_price * duration + journey_price * 2) * cur / 100; }
 	void output() {
 		char c[5];
 		switch (this->get_currency())
@@ -200,26 +203,13 @@ void sort(pass** p, int n) {
 	for (i = 1; i < n; i++) {
 		if (*p[i] > *p[i - 1])
 			continue;
-		if (typeid(*p[i]).name() == typeid(vacation).name()) {
-			temp = new vacation(*static_cast<vacation*>(p[i]));
-			t = 1;
-		}
-		if (typeid(*p[i]).name() == typeid(bus_tour).name()) {
-			temp = new bus_tour(*static_cast<bus_tour*>(p[i]));
-			t = 2;
-		}
+		SwapValues(temp, p[i]);
 		ptrpass = p + i - 1;
 		while (*temp < **ptrpass) {
-			if(typeid(**ptrpass).name() == typeid(vacation).name())
-				(*(ptrpass + 1)) = new vacation(*static_cast<vacation*>(*ptrpass));
-			else if(typeid(**ptrpass).name() == typeid(bus_tour).name())
-				(*(ptrpass + 1)) = new bus_tour(*static_cast<bus_tour*>(*ptrpass));
-			if (--ptrpass < p) break;
+			SwapValues(*(ptrpass + 1), *ptrpass);
+			if(--ptrpass < p) break;
 		}
-		if(t == 1)
-			(*(ptrpass + 1)) = new vacation(*static_cast<vacation*>(temp));
-		else if(t == 2)
-			(*(ptrpass + 1)) = new bus_tour(*static_cast<bus_tour*>(temp));
+		SwapValues(*(ptrpass + 1), temp);
 	}
 }
 
@@ -246,7 +236,8 @@ int main() {
 	return 0;
 }
 
-/*6
+/*Input template:
+6
 2
 USA
 1
